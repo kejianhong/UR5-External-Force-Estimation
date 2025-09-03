@@ -1,3 +1,6 @@
 [submodule "gnuplot-iostream"]
 	path = gnuplot-iostream
 	url = https://github.com/dstahlke/gnuplot-iostream
+[submodule "ur_rtde"]
+	path = ur_rtde
+	url = git@github.com:medra-ai/ur_rtde.git
