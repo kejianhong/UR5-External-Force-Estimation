@@ -12,6 +12,24 @@
 
 * Cartesian space impedance control with UR5. Can run the impedance control simulation with the [ursim_sb3](https://hub.docker.com/r/universalrobots/ursim_cb3) docker.
 
+* TODO: For the hand-guiding mode, set the matrix $K$ and $D$ to be zero matrix. Make the matrix $M$ small enough. Moreover, change the following code:
+
+```diff
+diff --git a/src/ImpedanceControl/impedanceControlExpFakeWrench.cpp b/src/ImpedanceControl/impedanceControlExpFakeWrench.cpp
+index 343ac20..0b33698 100644
+--- a/src/ImpedanceControl/impedanceControlExpFakeWrench.cpp
++++ b/src/ImpedanceControl/impedanceControlExpFakeWrench.cpp
+@@ -26,7 +26,7 @@ ImpedanceControl::~ImpedanceControl() {
+ 
+ void ImpedanceControl::computeImpedance() {
+   dderror = M.asDiagonal().inverse() * (tcpTauExt - D.asDiagonal() * derror - K.asDiagonal() * error);
+-  derror += dt * dderror;
++  derror = dt * dderror;
+   auto currTCPPose = getTcpTransformPose(rtde_receive.getActualTCPPose());
+   currTranslation = std::get<0>(currTCPPose);
+   currQuaternion = std::get<1>(currTCPPose);
+```
+
 ## Command
 
 ```bash
