@@ -1,12 +1,16 @@
-# UR5 External Force Estimation
+# UR5 External Force Estimation and Impedance Control
 
-* Implement the external force estimation algorithm based on disturbance observer in UR5 in Copeliasim.
+* Implement the external force estimation algorithm and the impedance control based on disturbance observer in UR5 in Copeliasim.
 
-## Implementation Detail
+## Force Estimation
 
 * Based on the dynamic parameter identification result of the UR5 robot in he Coppeliasim.
 * Simulation data containing position, velocity, acceleration and joint torque is collected in the Coppeliasim with the physic engine **Bullet2.83**. In simulation, there are no friction.
 * All data is collected without any external force. Apply the external force artificially in the <a href="./src/UR5EstimateForceEstimation.cpp" target="L111-120">code</a>, then use the disturbance observer to estimate the external force.
+
+## Impedance control
+
+* Cartesian space impedance control with UR5. Can run the impedance control simulation with the [ursim_sb3](https://hub.docker.com/r/universalrobots/ursim_cb3) docker.
 
 ## Command
 
@@ -14,14 +18,14 @@
 # Dependency to plot the result.
 sudo apt-get install gnuplot
 
-# Compile
-cd forceEstimation
-mkdir build
+# Compile.
+cd UR5-External-Force-Estimation
+mkdir build && cd build
 cmake ..
 make
 
-# Usage
-./bin/UR5EstimateForceEstimation -h                                           
+# Usage for external force estimation.
+./bin/UR5EstimateForceEstimation -h                                         
 Allow options:
   -h [ --help ]                        Turn the gain parameter for external 
                                        observer.
@@ -39,11 +43,21 @@ Allow options:
                                             5: kalman filter observer(Zero 
                                        order filter)
 
-# Example
+# Run the external force estimation program.
 ./bin/UR5EstimateForceEstimation -e vary -p normal -i 6_2000.csv -o 111.csv -t 2
+
+# Usage for Cartesian space impedance control.
+# Start the ursim docker.
+docker network rm ursim_net
+docker network create --subnet=192.168.0.0/24 ursim_net
+docker run --rm -it --net ursim_net --ip 192.168.0.2 -p 5900:5900 -p 6080:6080 universalrobots/ursim_cb3  # The ip should be the same with the program.
+# Run the Cartesian space impedance control program.
+./bin/testImpedanceExpControlFakeWrench 1 1 1 1 1 1
 ```
 
 ## Example
+
+* External force estimation.
 
 |               Method               |                                  Result                                  |
 | :---------------------------------: | :----------------------------------------------------------------------: |
@@ -53,6 +67,12 @@ Allow options:
 |      Filtered Dynamic Observer      |     <img src="./pic/filtered_dynamic_observer.png" width="400"/>     |
 |   Kalman Filter Observer (Tayler)   |   <img src="./pic/kalman_filter_observer_Tayler.png" width="400"/>   |
 | Kalman Filter Observer (Zero Order) | <img src="./pic/kalman_filter_observer_zero_order.png" width="400"/> |
+
+* Cartesian space impedance control.
+
+<center>
+<img src="./pic/UR5_Cartesian_space_impedance_control.png" width="400">
+</center>
 
 ## Reference
 
